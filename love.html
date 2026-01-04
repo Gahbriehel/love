@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roses Drawing Hearts</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #000000;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        font-family: "Arial", sans-serif;
+      }
+
+      #canvas {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .rose {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10;
+        filter: drop-shadow(0 0 8px rgba(255, 23, 68, 0.8));
+      }
+
+      .rose svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .petal-particle {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: radial-gradient(
+          ellipse at center,
+          #ff1744 0%,
+          #f50057 100%
+        );
+        border-radius: 50% 0 50% 0;
+        pointer-events: none;
+        z-index: 5;
+        animation: petalFall linear forwards;
+      }
+
+      @keyframes petalFall {
+        0% {
+          opacity: 1;
+          transform: translate(0, 0) rotate(0deg) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(var(--drift-x), 400px) rotate(720deg) scale(0.3);
+        }
+      }
+
+      .rose-trail {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        transform: translate(-50%, -50%);
+        opacity: 0.6;
+        pointer-events: none;
+        z-index: 8;
+        animation: fadeTrail 1s forwards;
+      }
+
+      @keyframes fadeTrail {
+        0% {
+          opacity: 0.6;
+          transform: translate(-50%, -50%) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.5);
+        }
+      }
+
+      .glow-line {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 3;
+        box-shadow: 0 0 15px currentColor;
+      }
+
+      /* UPDATED: Positioned at the bottom instead of the center */
+      .love-text-container {
+        position: absolute;
+        bottom: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 15px;
+        opacity: 0;
+        transition: opacity 2s;
+        z-index: 20;
+      }
+
+      .love-text-container.show {
+        opacity: 1;
+      }
+
+      .letter-rose {
+        width: 50px;
+        height: 50px;
+        filter: drop-shadow(0 0 10px rgba(255, 23, 68, 0.8));
+        animation: letterPulse 2s infinite;
+      }
+
+      @keyframes letterPulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.15);
+        }
+      }
+
+      .sparkle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: sparkleAnim 1s forwards;
+      }
+
+      @keyframes sparkleAnim {
+        0% {
+          opacity: 1;
+          transform: scale(0);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.5);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvas">
+      <div class="love-text-container" id="loveText"></div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const loveTextContainer = document.getElementById("loveText");
+
+      // These ensure the heart stays in the visual center
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+
+      function createRoseSVG(color = "#ff1744", color2 = "#f50057") {
+        return `
+                <svg viewBox="0 0 100 100">
+                    <ellipse cx="50" cy="40" rx="18" ry="25" fill="${color}" transform="rotate(0 50 40)"/>
+                    <ellipse cx="35" cy="47" rx="18" ry="25" fill="${color}" transform="rotate(-45 35 47)"/>
+                    <ellipse cx="65" cy="47" rx="18" ry="25" fill="${color}" transform="rotate(45 65 47)"/>
+                    <ellipse cx="30" cy="60" rx="18" ry="25" fill="${color}" transform="rotate(-80 30 60)"/>
+                    <ellipse cx="70" cy="60" rx="18" ry="25" fill="${color}" transform="rotate(80 70 60)"/>
+                    <ellipse cx="50" cy="50" rx="12" ry="18" fill="${color2}" transform="rotate(20 50 50)"/>
+                    <ellipse cx="42" cy="55" rx="12" ry="18" fill="${color2}" transform="rotate(-30 42 55)"/>
+                    <ellipse cx="58" cy="55" rx="12" ry="18" fill="${color2}" transform="rotate(30 58 55)"/>
+                    <circle cx="50" cy="55" r="8" fill="#c62828"/>
+                </svg>
+            `;
+      }
+
+      function createPetal(x, y) {
+        const petal = document.createElement("div");
+        petal.className = "petal-particle";
+        petal.style.left = x + "px";
+        petal.style.top = y + "px";
+        petal.style.setProperty(
+          "--drift-x",
+          (Math.random() - 0.5) * 100 + "px"
+        );
+        petal.style.animationDuration = 1.5 + Math.random() * 1 + "s";
+        canvas.appendChild(petal);
+        setTimeout(() => petal.remove(), 3000);
+      }
+
+      function createSparkle(x, y) {
+        const sparkle = document.createElement("div");
+        sparkle.className = "sparkle";
+        sparkle.style.left = x + "px";
+        sparkle.style.top = y + "px";
+        canvas.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 1000);
+      }
+
+      function createGlowDot(x, y, color) {
+        const dot = document.createElement("div");
+        dot.className = "glow-line";
+        dot.style.left = x + "px";
+        dot.style.top = y + "px";
+        dot.style.background = color;
+        dot.style.color = color;
+        canvas.appendChild(dot);
+      }
+
+      function generateHeartPoints(size, segments = 300) {
+        const points = [];
+        for (let i = 0; i <= segments; i++) {
+          const t = (i / segments) * Math.PI * 2;
+          const x = size * 16 * Math.pow(Math.sin(t), 3);
+          const y =
+            -size *
+            (13 * Math.cos(t) -
+              5 * Math.cos(2 * t) -
+              2 * Math.cos(3 * t) -
+              Math.cos(4 * t));
+          points.push({
+            x: centerX + x,
+            y: centerY + y,
+          });
+        }
+        return points;
+      }
+
+      function animateHeartWithRose(size, color1, color2, delay, speed = 15) {
+        setTimeout(() => {
+          const points = generateHeartPoints(size);
+          let currentIndex = 0;
+
+          const rose = document.createElement("div");
+          rose.className = "rose";
+          rose.innerHTML = createRoseSVG(color1, color2);
+          canvas.appendChild(rose);
+
+          function drawStep() {
+            if (currentIndex >= points.length) {
+              rose.remove();
+              return;
+            }
+
+            const point = points[currentIndex];
+            rose.style.left = point.x + "px";
+            rose.style.top = point.y + "px";
+
+            createGlowDot(point.x, point.y, color1);
+
+            if (currentIndex % 8 === 0) {
+              createPetal(point.x, point.y);
+            }
+
+            if (currentIndex % 15 === 0) {
+              createSparkle(
+                point.x + (Math.random() - 0.5) * 20,
+                point.y + (Math.random() - 0.5) * 20
+              );
+            }
+
+            if (currentIndex % 3 === 0) {
+              const trail = document.createElement("div");
+              trail.className = "rose-trail";
+              trail.innerHTML = createRoseSVG(color1, color2);
+              trail.style.left = point.x + "px";
+              trail.style.top = point.y + "px";
+              canvas.appendChild(trail);
+              setTimeout(() => trail.remove(), 1000);
+            }
+
+            currentIndex++;
+            setTimeout(drawStep, speed);
+          }
+
+          drawStep();
+        }, delay);
+      }
+
+      function createLoveTextWithRoses() {
+        setTimeout(() => {
+          const letters = ["I", "❤", "L", "O", "V", "E", "", "Y", "O", "U"];
+          const colors = [
+            ["#ff1744", "#f50057"],
+            ["#f50057", "#ff4081"],
+            ["#ff4081", "#ff80ab"],
+            ["#ff80ab", "#ff5252"],
+            ["#ff5252", "#ff1744"],
+            ["#ff1744", "#f50057"],
+            ["#f50057", "#ff4081"],
+            ["#ff4081", "#ff80ab"],
+            ["#ff80ab", "#ff5252"],
+            ["#ff5252", "#ff1744"],
+          ];
+
+          letters.forEach((letter, i) => {
+            setTimeout(() => {
+              if (letter === "❤") {
+                const heart = document.createElement("div");
+                heart.className = "letter-rose";
+                heart.style.animationDelay = i * 0.1 + "s";
+                heart.innerHTML = `<svg viewBox="0 0 100 100"><path d="M50,85 C50,85 15,60 15,40 C15,25 25,15 35,15 C42,15 48,20 50,25 C52,20 58,15 65,15 C75,15 85,25 85,40 C85,60 50,85 50,85 Z" fill="${colors[i][0]}"/></svg>`;
+                loveTextContainer.appendChild(heart);
+              } else if (letter !== "") {
+                const letterDiv = document.createElement("div");
+                letterDiv.className = "letter-rose";
+                letterDiv.style.animationDelay = i * 0.1 + "s";
+                letterDiv.innerHTML = createRoseSVG(colors[i][0], colors[i][1]);
+                letterDiv.style.position = "relative";
+
+                const text = document.createElement("div");
+                text.textContent = letter;
+                text.style.position = "absolute";
+                text.style.top = "50%";
+                text.style.left = "50%";
+                text.style.transform = "translate(-50%, -50%)";
+                text.style.fontSize = "24px";
+                text.style.fontWeight = "bold";
+                text.style.color = "white";
+                text.style.textShadow = "0 0 5px rgba(0,0,0,0.8)";
+                letterDiv.appendChild(text);
+
+                loveTextContainer.appendChild(letterDiv);
+              } else {
+                const space = document.createElement("div");
+                space.style.width = "30px";
+                loveTextContainer.appendChild(space);
+              }
+            }, i * 200);
+          });
+
+          setTimeout(() => {
+            loveTextContainer.classList.add("show");
+          }, letters.length * 200);
+        }, 18000);
+      }
+
+      const heartConfigs = [
+        { size: 3, color1: "#ff5252", color2: "#ff1744", delay: 0, speed: 12 },
+        {
+          size: 5,
+          color1: "#ff4081",
+          color2: "#f50057",
+          delay: 4000,
+          speed: 11,
+        },
+        {
+          size: 7,
+          color1: "#ff80ab",
+          color2: "#ff4081",
+          delay: 8000,
+          speed: 10,
+        },
+        {
+          size: 9,
+          color1: "#f50057",
+          color2: "#ff1744",
+          delay: 12000,
+          speed: 9,
+        },
+        {
+          size: 11,
+          color1: "#ff1744",
+          color2: "#c62828",
+          delay: 16000,
+          speed: 8,
+        },
+      ];
+
+      heartConfigs.forEach((config) => {
+        animateHeartWithRose(
+          config.size,
+          config.color1,
+          config.color2,
+          config.delay,
+          config.speed
+        );
+      });
+
+      createLoveTextWithRoses();
+    </script>
+  </body>
+</html>
