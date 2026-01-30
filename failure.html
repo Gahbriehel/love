@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorry</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .message {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 2s forwards;
+            max-width: 600px;
+            padding: 20px;
+            line-height: 1.6;
+            font-size: 24px;
+        }
+
+        h1 {
+            color: #ff1744;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #ccc;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #ff1744;
+            color: #ff1744;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s ease all;
+        }
+
+        button:hover {
+            background: #ff1744;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="message">
+        <h1>Good try!</h1>
+        <p>But this isn't for you. Thanks for trying though..</p>
+        <button onclick="window.location.href = 'index.html'">Try again</button>
+    </div>
+</body>
+
+</html>

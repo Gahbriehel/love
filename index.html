@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who are you?</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #333;
+            color: #fff;
+            font-size: 24px;
+            padding: 10px 5px;
+            width: 300px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-bottom-color: #ff1744;
+        }
+
+        .placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: 0.3s ease all;
+            color: #666;
+            font-size: 24px;
+        }
+
+        input:focus~.placeholder,
+        input:not(:placeholder-shown)~.placeholder {
+            top: -20px;
+            font-size: 14px;
+            color: #ff1744;
+        }
+
+        /* Ambient particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 10s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="container">
+        <div class="input-group">
+            <input type="text" id="nameInput" autocomplete="off" placeholder=" ">
+            <label class="placeholder">What do I call you?</label>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('nameInput');
+        const correctName = 'chiquita';
+
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const value = input.value.trim();
+                if (value === correctName) {
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 1s';
+                    setTimeout(() => {
+                        window.location.href = 'love.html';
+                    }, 2000);
+                } else {
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 1s';
+                    setTimeout(() => {
+                        window.location.href = 'failure.html';
+                    }, 2000);
+                }
+            }
+        });
+
+        // Create background particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = Math.random() * 100 + 'vh';
+            p.style.width = Math.random() * 3 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 5 + 5 + 's';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            particlesContainer.appendChild(p);
+        }
+    </script>
+</body>
+
+</html>
