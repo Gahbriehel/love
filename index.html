@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Who are you?</title>
+    <title>love</title>
+    <link rel="shortcut icon" href="images/heart.jpeg" type="image/x-icon">
     <style>
         body {
             margin: 0;
@@ -116,18 +117,18 @@
         input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 const value = input.value.trim();
-                if (value === correctName) {
+                if (value.toLowerCase() === correctName.toLowerCase()) {
                     document.body.style.opacity = '0';
                     document.body.style.transition = 'opacity 1s';
                     setTimeout(() => {
                         window.location.href = 'love.html';
-                    }, 2000);
+                    }, 1000);
                 } else {
                     document.body.style.opacity = '0';
                     document.body.style.transition = 'opacity 1s';
                     setTimeout(() => {
                         window.location.href = 'failure.html';
-                    }, 2000);
+                    }, 1000);
                 }
             }
         });
