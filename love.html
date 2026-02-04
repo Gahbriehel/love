@@ -102,27 +102,38 @@
       box-shadow: 0 0 15px currentColor;
     }
 
-    /* UPDATED: Positioned at the bottom instead of the center */
     .love-text-container {
       position: absolute;
-      bottom: 10%;
+      bottom: 7%;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 15px;
-      opacity: 0;
-      transition: opacity 2s;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2.5vmin 4vmin;
+      max-width: 94vw;
       z-index: 20;
+      opacity: 0;
+      transition: opacity 2.2s ease-in;
+      pointer-events: none;
     }
 
     .love-text-container.show {
       opacity: 1;
     }
 
+    .word-group {
+      display: flex;
+      gap: 2vmin;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     .letter-rose {
-      width: 50px;
-      height: 50px;
-      filter: drop-shadow(0 0 10px rgba(255, 23, 68, 0.8));
+      width: 9vmin;
+      height: 9vmin;
+      position: relative;
+      filter: drop-shadow(0 0 1.1vmin rgba(255, 35, 80, 0.9));
       animation: letterPulse 2s infinite;
     }
 
@@ -136,6 +147,18 @@
       50% {
         transform: scale(1.15);
       }
+    }
+
+    .letter-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4vmin;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 0.7vmin #000;
+      pointer-events: none;
     }
 
     .sparkle {
@@ -164,12 +187,32 @@
         transform: scale(0);
       }
     }
+
+    @media (max-width: 500px) {
+      .love-text-container {
+        bottom: 5%;
+        gap: 2vmin 3.5vmin;
+      }
+
+      .letter-rose {
+        width: 10vmin;
+        height: 10vmin;
+      }
+
+      .letter-text {
+        font-size: 4.4vmin;
+      }
+    }
   </style>
 </head>
 
 <body>
   <div id="canvas">
-    <div class="love-text-container" id="loveText"></div>
+    <div class="love-text-container" id="loveText">
+      <div class="word-group" id="wordI"></div>
+      <div class="word-group" id="wordLove"></div>
+      <div class="word-group" id="wordYou"></div>
+    </div>
   </div>
 
   <script>
@@ -301,59 +344,58 @@
 
     function createLoveTextWithRoses() {
       setTimeout(() => {
-        const letters = ["I", "❤", "L", "O", "V", "E", "", "Y", "O", "U"];
-        const colors = [
-          ["#ff1744", "#f50057"],
-          ["#f50057", "#ff4081"],
-          ["#ff4081", "#ff80ab"],
-          ["#ff80ab", "#ff5252"],
-          ["#ff5252", "#ff1744"],
-          ["#ff1744", "#f50057"],
-          ["#f50057", "#ff4081"],
-          ["#ff4081", "#ff80ab"],
-          ["#ff80ab", "#ff5252"],
-          ["#ff5252", "#ff1744"],
+        const groups = [
+          { id: "wordI", letters: ["I"], colors: [["#ff5252", "#ff1744"]] },
+          {
+            id: "wordLove",
+            letters: ["L", "O", "V", "E"],
+            colors: [
+              ["#ff4081", "#f50057"],
+              ["#ff80ab", "#ff4081"],
+              ["#ff5252", "#ff1744"],
+              ["#ff1744", "#f50057"],
+            ],
+          },
+          {
+            id: "wordYou",
+            letters: ["Y", "O", "U"],
+            colors: [
+              ["#ff4081", "#f50057"],
+              ["#ff80ab", "#ff4081"],
+              ["#ff5252", "#ff1744"],
+            ],
+          },
         ];
 
-        letters.forEach((letter, i) => {
-          setTimeout(() => {
-            if (letter === "❤") {
-              const heart = document.createElement("div");
-              heart.className = "letter-rose";
-              heart.style.animationDelay = i * 0.1 + "s";
-              heart.innerHTML = `<svg viewBox="0 0 100 100"><path d="M50,85 C50,85 15,60 15,40 C15,25 25,15 35,15 C42,15 48,20 50,25 C52,20 58,15 65,15 C75,15 85,25 85,40 C85,60 50,85 50,85 Z" fill="${colors[i][0]}"/></svg>`;
-              loveTextContainer.appendChild(heart);
-            } else if (letter !== "") {
+        let delay = 0;
+
+        groups.forEach((group) => {
+          const container = document.getElementById(group.id);
+
+          group.letters.forEach((letter, j) => {
+            setTimeout(() => {
               const letterDiv = document.createElement("div");
               letterDiv.className = "letter-rose";
-              letterDiv.style.animationDelay = i * 0.1 + "s";
-              letterDiv.innerHTML = createRoseSVG(colors[i][0], colors[i][1]);
-              letterDiv.style.position = "relative";
+              letterDiv.innerHTML = createRoseSVG(
+                group.colors[j][0],
+                group.colors[j][1]
+              );
 
               const text = document.createElement("div");
+              text.className = "letter-text";
               text.textContent = letter;
-              text.style.position = "absolute";
-              text.style.top = "50%";
-              text.style.left = "50%";
-              text.style.transform = "translate(-50%, -50%)";
-              text.style.fontSize = "24px";
-              text.style.fontWeight = "bold";
-              text.style.color = "white";
-              text.style.textShadow = "0 0 5px rgba(0,0,0,0.8)";
               letterDiv.appendChild(text);
 
-              loveTextContainer.appendChild(letterDiv);
-            } else {
-              const space = document.createElement("div");
-              space.style.width = "30px";
-              loveTextContainer.appendChild(space);
-            }
-          }, i * 200);
+              container.appendChild(letterDiv);
+            }, delay);
+
+            delay += 200;
+          });
         });
 
         setTimeout(() => {
           loveTextContainer.classList.add("show");
-        }, letters.length * 200);
+        }, delay + 400);
       }, 18000);
     }
 
