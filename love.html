@@ -31,12 +31,12 @@
 
     .rose {
       position: absolute;
-      width: 40px;
-      height: 40px;
+      width: 5vmin;
+      height: 5vmin;
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 10;
-      filter: drop-shadow(0 0 8px rgba(255, 23, 68, 0.8));
+      filter: drop-shadow(0 0 0.8vmin rgba(255, 23, 68, 0.8));
     }
 
     .rose svg {
@@ -46,8 +46,8 @@
 
     .petal-particle {
       position: absolute;
-      width: 12px;
-      height: 12px;
+      width: 1.5vmin;
+      height: 1.5vmin;
       background: radial-gradient(ellipse at center,
           #ff1744 0%,
           #f50057 100%);
@@ -65,14 +65,14 @@
 
       100% {
         opacity: 0;
-        transform: translate(var(--drift-x), 400px) rotate(720deg) scale(0.3);
+        transform: translate(var(--drift-x), 50vmin) rotate(720deg) scale(0.3);
       }
     }
 
     .rose-trail {
       position: absolute;
-      width: 30px;
-      height: 30px;
+      width: 4vmin;
+      height: 4vmin;
       transform: translate(-50%, -50%);
       opacity: 0.6;
       pointer-events: none;
@@ -94,12 +94,12 @@
 
     .glow-line {
       position: absolute;
-      width: 6px;
-      height: 6px;
+      width: 0.7vmin;
+      height: 0.7vmin;
       border-radius: 50%;
       pointer-events: none;
       z-index: 3;
-      box-shadow: 0 0 15px currentColor;
+      box-shadow: 0 0 1.8vmin currentColor;
     }
 
     .love-text-container {
@@ -163,8 +163,8 @@
 
     .sparkle {
       position: absolute;
-      width: 4px;
-      height: 4px;
+      width: 0.7vmin;
+      height: 0.7vmin;
       background: white;
       border-radius: 50%;
       pointer-events: none;
@@ -220,8 +220,14 @@
     const loveTextContainer = document.getElementById("loveText");
 
     // These ensure the heart stays in the visual center
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
+    let centerX = window.innerWidth / 2;
+    let centerY = window.innerHeight / 2;
+
+    // Update center on resize
+    window.addEventListener('resize', () => {
+      centerX = window.innerWidth / 2;
+      centerY = window.innerHeight / 2;
+    });
 
     function createRoseSVG(color = "#ff1744", color2 = "#f50057") {
       return `
@@ -246,7 +252,7 @@
       petal.style.top = y + "px";
       petal.style.setProperty(
         "--drift-x",
-        (Math.random() - 0.5) * 100 + "px"
+        (Math.random() - 0.5) * 24 + "vmin"
       );
       petal.style.animationDuration = 1.5 + Math.random() * 1 + "s";
       canvas.appendChild(petal);
